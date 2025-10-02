@@ -1,0 +1,66 @@
+% Input image
+img = imread('baboon24.bmp');
+
+% Convert the image into vector
+vec = img;
+figure('Name', 'Original Image', 'NumberTitle', 'off');
+imshow(vec);
+
+% --- Image Brightening ---
+disp('Image Brightening:');
+a = input('a: ');
+b = input('b: ');
+
+vec = (vec .* a) + b;
+
+figure('Name', 'Image Brightening', 'NumberTitle', 'off');
+imshow(vec);
+
+% --- Negative ---
+disp('Negative:');
+
+vec = 255 - vec;
+
+figure('Name', 'Negative Image', 'NumberTitle', 'off');
+imshow(vec);
+
+% --- Log Transformation ---
+disp('Log Transformation:');
+c = input('c: ');
+r = input('r: ');
+
+vec = double(vec);
+vec = c .* log(vec + r);
+vec = uint8(vec);
+
+figure('Name', 'Log Transformation', 'NumberTitle', 'off');
+imshow(vec);
+
+% --- Exponent Transformation ---
+disp('Exponent Transformation:');
+c2 = input('c: ');
+y = input('y: ');
+
+vec = double(vec);
+vec = c .* (vec .^ y);
+vec = uint8(vec);
+
+figure('Name', 'Exponent Transformation', 'NumberTitle', 'off');
+imshow(vec);
+
+% --- Contrast Stretching ---
+disp('Contrast Stretching:');
+
+vec = double(vec);
+
+r_min = min(vec);
+r_max = max(vec);
+s_min = 0;
+s_max = 255;
+
+vec = s_max .* ((vec - r_min) ./ (r_max - r_min));
+
+vec = uint8(vec);
+
+figure('Name', 'Contrast Stretching', 'NumberTitle', 'off');
+imshow(vec);

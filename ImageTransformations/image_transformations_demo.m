@@ -1,10 +1,10 @@
-% Image Transformations Demo with side-by-side histogram comparisons
+% Image Transformations Demo with user-defined parameters and histogram comparisons
 clc; 
 clear; 
 close all;
 
 % --- 1. Setup Image Directory ---
-image_folder = '.'; 
+image_folder = './test_case/';
 image_files = [
     dir(fullfile(image_folder, '*.bmp')); 
     dir(fullfile(image_folder, '*.png'));
@@ -12,16 +12,29 @@ image_files = [
 ];
 
 if isempty(image_files)
-    error('No image files (.bmp, .png, .jpg) found in the current directory.');
+    error('No image files (.bmp, .png, .jpg) found in the specified directory ("%s").', image_folder);
 end
 
-% --- 2. Define Transformation Parameters ---
-params.brighten.a = 1.2;
-params.brighten.b = 30;
-params.log.c = 45;
-params.log.r = 1;
-params.exponent.c = 1.05;
-params.exponent.y = 1.1;
+% --- 2. Get Transformation Parameters from User ---
+disp('Please enter the parameters for the image transformations.');
+params = struct(); % Initialize params struct
+
+% Brightening parameters
+disp('--- Brightening ---');
+params.brighten.a = input('Enter scaling factor a (e.g., 1.2): ');
+params.brighten.b = input('Enter offset b (e.g., 30): ');
+
+% Log transform parameters
+disp('--- Log Transformation ---');
+params.log.c = input('Enter constant c (e.g., 45): ');
+params.log.r = input('Enter offset r (e.g., 1): ');
+
+% Exponent transform parameters
+disp('--- Exponent Transformation ---');
+params.exponent.c = input('Enter constant c (e.g., 1.05): ');
+params.exponent.y = input('Enter power y (gamma) (e.g., 1.1): ');
+
+fprintf('\nParameters set. Starting image processing...\n\n');
 
 % --- Helper function for plotting histograms ---
 function plotCustomHistogram(subplotHandle, image, plotTitle)
@@ -52,19 +65,18 @@ for k = 1:length(image_files)
         continue;
     end
     
-    % Apply all transformations
+    % Apply all transformations using the user-defined parameters
     transformed = imageTransformations(img, params);
     
     % --- Create comparison plots for each transformation ---
-    
-    % Get all transformation names from the struct fields
     transform_names = fieldnames(transformed);
     
     for i = 1:length(transform_names)
         t_name = transform_names{i};
-        img_transformed = transformed.(t_name); % Get transformed image using dynamic field name
+        img_transformed = transformed.(t_name);
         
-        figure('Name', [current_filename ' - ' t_name], 'NumberTitle', 'off');
+        % Create a new figure for each transformation of each image
+        figure('Name', sprintf('%s - %s', current_filename, t_name), 'NumberTitle', 'off', 'WindowState', 'maximized');
         
         % Original Image
         h1 = subplot(2, 2, 1);
@@ -78,11 +90,11 @@ for k = 1:length(image_files)
         % Transformed Image
         h3 = subplot(2, 2, 3);
         imshow(img_transformed);
-        title(['Transformed: ' t_name]);
+        title(sprintf('Transformed: %s', t_name));
         
         % Transformed Histogram
         h4 = subplot(2, 2, 4);
-        plotCustomHistogram(h4, img_transformed, [t_name ' Histogram']);
+        plotCustomHistogram(h4, img_transformed, sprintf('%s Histogram', t_name));
     end
 end
 

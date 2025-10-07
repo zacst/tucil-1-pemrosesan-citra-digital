@@ -5,17 +5,17 @@ close all;
 
 % --- 1. Setup Image Directory ---
 % Define the folder where your images are located. '.' means the current folder.
-image_folder = '.'; 
+image_folder = './test_case/';
 % Find all common image types in the specified folder.
 image_files = [
-    dir(fullfile(image_folder, '*.bmp')); 
+    dir(fullfile(image_folder, '*.bmp'));
     dir(fullfile(image_folder, '*.png'));
     dir(fullfile(image_folder, '*.jpg'))
 ];
 
 % Check if any images were found
 if isempty(image_files)
-    error('No image files (.bmp, .png, .jpg) found in the current directory.');
+    error('No image files (.bmp, .png, .jpg) found in the directory.');
 end
 
 % --- 2. Loop Through Each Image ---

@@ -4,7 +4,7 @@ clear;
 close all;
 
 % --- 1. Setup Image Directory and Target Image ---
-image_folder = '.'; 
+image_folder = './test_case/'; 
 image_files = [
     dir(fullfile(image_folder, '*.bmp')); 
     dir(fullfile(image_folder, '*.png'));
@@ -14,7 +14,7 @@ image_files = [
 % --- Define the target image ---
 % IMPORTANT: You must have an image named 'target.png' (or change the name below)
 % in the same directory for this demo to work.
-target_filename = 'target.png';
+target_filename = './test_case/2.jpg';
 if ~exist(target_filename, 'file')
     error('Target image "%s" not found. Please add it to the directory.', target_filename);
 end

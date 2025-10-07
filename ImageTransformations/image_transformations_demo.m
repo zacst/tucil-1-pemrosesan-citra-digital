@@ -4,7 +4,7 @@ clear;
 close all;
 
 % --- 1. Setup Image Directory ---
-image_folder = './test_case/';
+image_folder = './test_case/'; % Make sure this folder exists
 image_files = [
     dir(fullfile(image_folder, '*.bmp')); 
     dir(fullfile(image_folder, '*.png'));
@@ -16,7 +16,7 @@ if isempty(image_files)
 end
 
 % --- 2. Get Transformation Parameters from User ---
-disp('Please enter the parameters for the image transformations.');
+disp('Please enter the parameters for the sequential image transformations.');
 params = struct(); % Initialize params struct
 
 % Brightening parameters
@@ -65,37 +65,49 @@ for k = 1:length(image_files)
         continue;
     end
     
-    % Apply all transformations using the user-defined parameters
-    transformed = imageTransformations(img, params);
+    % --- Apply all transformations sequentially ---
+    % Step 1: Brightening
+    img_processed = uint8(double(img) .* params.brighten.a + params.brighten.b);
     
-    % --- Create comparison plots for each transformation ---
-    transform_names = fieldnames(transformed);
+    % Step 2: Negative
+    img_processed = 255 - img_processed;
     
-    for i = 1:length(transform_names)
-        t_name = transform_names{i};
-        img_transformed = transformed.(t_name);
-        
-        % Create a new figure for each transformation of each image
-        figure('Name', sprintf('%s - %s', current_filename, t_name), 'NumberTitle', 'off', 'WindowState', 'maximized');
-        
-        % Original Image
-        h1 = subplot(2, 2, 1);
-        imshow(img);
-        title('Original');
-        
-        % Original Histogram
-        h2 = subplot(2, 2, 2);
-        plotCustomHistogram(h2, img, 'Original Histogram');
-        
-        % Transformed Image
-        h3 = subplot(2, 2, 3);
-        imshow(img_transformed);
-        title(sprintf('Transformed: %s', t_name));
-        
-        % Transformed Histogram
-        h4 = subplot(2, 2, 4);
-        plotCustomHistogram(h4, img_transformed, sprintf('%s Histogram', t_name));
+    % Step 3: Log Transformation
+    img_processed = uint8(params.log.c .* log(double(img_processed) + params.log.r));
+    
+    % Step 4: Exponent Transformation
+    img_processed = uint8(params.exponent.c .* (double(img_processed) .^ params.exponent.y));
+    
+    % Step 5: Contrast Stretching
+    r_min = double(min(img_processed(:)));
+    r_max = double(max(img_processed(:)));
+    % Handle case where the image is flat to avoid division by zero
+    if r_min == r_max
+        final_image = uint8(0 .* ones(size(img_processed)));
+    else
+        final_image = uint8(255 .* ((double(img_processed) - r_min) ./ (r_max - r_min)));
     end
+    
+    % --- Create a single comparison plot for the final result ---
+    figure('Name', [current_filename ' - All Transformations'], 'NumberTitle', 'off', 'WindowState', 'maximized');
+    
+    % Original Image
+    h1 = subplot(2, 2, 1);
+    imshow(img);
+    title('Original');
+    
+    % Original Histogram
+    h2 = subplot(2, 2, 2);
+    plotCustomHistogram(h2, img, 'Original Histogram');
+    
+    % Final Transformed Image
+    h3 = subplot(2, 2, 3);
+    imshow(final_image);
+    title('Final Image (All Transformations)');
+    
+    % Final Transformed Histogram
+    h4 = subplot(2, 2, 4);
+    plotCustomHistogram(h4, final_image, 'Final Histogram');
 end
 
 disp('Finished processing all images.');

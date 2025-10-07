@@ -4,9 +4,9 @@ clear;
 close all;
 
 % --- 1. Setup Image Directory ---
-image_folder = '.'; % Use the current folder
+image_folder = './test_case/'; % Use the current folder
 image_files = [
-    dir(fullfile(image_folder, '*.bmp')); 
+    dir(fullfile(image_folder, '*.bmp'));
     dir(fullfile(image_folder, '*.png'));
     dir(fullfile(image_folder, '*.jpg'))
 ];
